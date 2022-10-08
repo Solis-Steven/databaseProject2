@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#centralwidget{
+	background-color: qlineargradient(spread:pad, x1:0.063, y1:0.068, x2:0.744318, y2:0.83, stop:0 rgba(0, 255, 127, 255), stop:1 rgba(90, 90, 90, 255));
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>0</y>
+      <width>621</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 36pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>VERTICAL SEGMENTATION</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblAttributeName">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>100</y>
+      <width>81</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>Attribute:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputAttributeName">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>110</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 10pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Attribute name</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTableName">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>100</y>
+      <width>81</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>Table:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputTableName">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>110</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 10pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Table name</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblNodes">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>140</y>
+      <width>81</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>Nodes:</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lstAttributes">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>230</y>
+      <width>241</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 16pt &quot;Arial&quot;;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnCreate">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>440</y>
+      <width>701</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>CREATE TABLE</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnAdd">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>190</y>
+      <width>241</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>ADD ATTRIBUTE</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbNodes">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>150</y>
+      <width>241</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 12pt &quot;Arial&quot;;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnVertical">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>550</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>GO BACK</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblType">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>130</y>
+      <width>81</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>Type:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnAddNode">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>190</y>
+      <width>321</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>ADD NODE</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lstNodes">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>230</y>
+      <width>321</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 16pt &quot;Arial&quot;;</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chbPK">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>170</y>
+      <width>241</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 16pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string>PRYMARY KEY</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputAttributeType">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>140</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 10pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Attribute type</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
