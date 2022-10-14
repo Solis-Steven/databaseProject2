@@ -105,7 +105,7 @@ def guiDeleteSelectedNodes():
     verticalWindow.lstNodes.clear()
 
 
-# Botonoes
+# Botones
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
 nodesWindow.btnVertical.clicked.connect(guiVerticalWindow)
 verticalWindow.btnAddNode.clicked.connect(guiSelectNode)
