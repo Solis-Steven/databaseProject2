@@ -237,6 +237,10 @@ def guiMainHorizontalWindow():
 def guiHorizontalWindow():
     mainHorizontalWindow.hide()
 
+    nodes = []
+    for node in range(nodesWindow.lstInsertedNodes.count()):
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text())    
+
     tableName = mainHorizontalWindow.inputTableName.text()
     attributes = mainHorizontalWindow.inputTable.toPlainText()
     mainHorizontalWindow.inputTable.setPlainText("")
@@ -262,6 +266,10 @@ def guiHorizontalWindow():
             mainNode["port"] = node["port"]
             mainNode["user"] = node["user"]
             mainNode["password"] = node["password"]
+
+    for node in nodes:
+        if node != mainNode["name"]:
+            horizontalWindow.cbNodes.addItem(node)
     
     horizontalWindow.show()
     generateMHTable(query, primaryKey, tableName)
