@@ -79,11 +79,12 @@ localizado en la base de datos con los datos brindados
 por el usuario
 """
 def doConnection(query, node):
-    connection = makeConnection(node["mainHost"], 
-                                node["mainPort"], 
-                                node["mainUser"], 
-                                node["mainPassword"], 
-                                node["mainDbName"]) #se crea la conexion con los datos del n
+    print(node)
+    connection = makeConnection(node["host"], 
+                                node["port"], 
+                                node["user"], 
+                                node["password"], 
+                                node["database"]) #se crea la conexion con los datos del n
   
     connection.autocommit = True #se habilita los commits automaticos
     cursor = connection.cursor() #se crea cursor para ejecutar queries
@@ -252,21 +253,21 @@ def guiHorizontalWindow():
     );
     """.format(tableName, attributes)
 
-    mainNode["mainName"] = mainHorizontalWindow.cbNodes.currentText()
+    mainNode["name"] = mainHorizontalWindow.cbNodes.currentText()
 
     for node in nodeList:
-        if node["name"] == mainNode["mainName"]:
-            # mainNode["mainHost"] = node["host"]
-            mainNode["mainDbName"] = node["database"]
-            mainNode["mainPort"] = node["port"]
-            mainNode["mainUser"] = node["user"]
-            mainNode["mainPassword"] = node["password"]
+        if node["name"] == mainNode["name"]:
+            mainNode["host"] = node["host"]
+            mainNode["database"] = node["database"]
+            mainNode["port"] = node["port"]
+            mainNode["user"] = node["user"]
+            mainNode["password"] = node["password"]
     
     horizontalWindow.show()
-    generateMHTable(query)
+    generateMHTable(query, primaryKey, tableName)
 
 
-def generateMHTable(query):
+def generateMHTable(query,primaryKey, tableName):
     doConnection(query, mainNode)
 
     horizontalWindow.inputTable.setPlainText("""
@@ -276,10 +277,10 @@ def generateMHTable(query):
     """.format(tableName, primaryKey))
 
 
-def guiHorizontalWindow(query):
+def guiHorizontalWindow2(tableName,primaryKey):
 
     table = horizontalWindow.inputTable.toPlainText()
-    nodeName = horizontalWindow.cbNodes.currentText() 
+    nodeName = horizontalWindow.cbNodes.currentText()
 
     node = {
         "name": "",
@@ -290,6 +291,7 @@ def guiHorizontalWindow(query):
         "password": ""
     }
 
+
     for i in nodeList:
         if i["name"] == nodeName:
             node["name"] = i["name"]
@@ -297,9 +299,8 @@ def guiHorizontalWindow(query):
             node["port"] = i["port"]
             node["database"] = i["database"]
             node["user"] = i["user"]
-            node["password"] = i["password"]
-            
-    doConnection(query, node) #se crea la conexion con los datos del nodo
+            node["password"] = i["password"] 
+    doConnection(table, node) #se crea la conexion con los datos del nodo
 
     horizontalWindow.inputTable.setPlainText("""
     CREATE TABLE {} (
@@ -316,7 +317,7 @@ verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
 nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
 mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
-horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
+horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
 
 
 # Ejecutable
