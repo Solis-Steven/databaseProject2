@@ -294,7 +294,7 @@ color: rgb(255, 255, 255);
      <string>INSERT NODE</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnNext">
+   <widget class="QPushButton" name="btnBoth">
     <property name="geometry">
      <rect>
       <x>660</x>

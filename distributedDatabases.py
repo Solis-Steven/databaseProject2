@@ -4,6 +4,9 @@ from conexion_postgresql import *
 # Lista para almacenar los nodos
 nodeList = []
 
+global tableName #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
+global primaryKey
+
 mainNode = {
     "name": "",
     "host": "",
@@ -23,6 +26,8 @@ horizontalWindow = uic.loadUi("GUI/horizontalWindow.ui")
 mainHorizontalWindow = uic.loadUi("GUI/mainHorizontalWindow.ui")
 mainHorizontalWindow = uic.loadUi("GUI/mainHorizontalWindow.ui")
 deleteWindow = uic.loadUi("GUI/deleteWindow.ui")
+mainBothWindow = uic.loadUi("GUI/mainBothWindow.ui")
+bothWindow = uic.loadUi("GUI/bothWindow.ui")
 
 """
 Esta funcion abre la ventana para la creacion
@@ -250,11 +255,10 @@ def guiHorizontalWindow():
     for node in range(nodesWindow.lstInsertedNodes.count()):
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
-    global tableName #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
-    global primaryKey
     tableName = mainHorizontalWindow.inputTableName.text()
     attributes = mainHorizontalWindow.inputTable.toPlainText()
     mainHorizontalWindow.inputTable.setPlainText("")
+    mainHorizontalWindow.inputTableName.setText("")
     attributesList = attributes.split(",\n") #se recogen los atributos introducidos
     
     
@@ -414,12 +418,102 @@ def guiGoBackD():
     nodesWindow.show()
 
 
+def guiMainBothWindow():
+    nodesWindow.hide()
+
+    nodes = []
+    for node in range(nodesWindow.lstInsertedNodes.count()): #se recorre la lista de nodos seleccionados y se añaden a la local
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text())
+    
+    for node in nodes:
+        mainBothWindow.cbNodes.addItem(node) #se añaden los nodos creados en la ventana principal al combobox
+
+    mainBothWindow.show()
+
+
+def guiGoBackMB():
+    mainBothWindow.hide()
+    nodesWindow.show()
+    mainBothWindow.cbNodes.clear()
+    mainBothWindow.inputTable.setPlainText("")
+    mainBothWindow.inputTableName.setText("")
+
+
+def guiBothWindow():
+    mainBothWindow.hide()
+
+    nodes = []
+    for node in range(nodesWindow.lstInsertedNodes.count()):
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
+
+    tableName = mainBothWindow.inputTableName.text()
+    attributes = mainBothWindow.inputTable.toPlainText()
+    mainBothWindow.inputTable.setPlainText("")
+    mainBothWindow.inputTableName.setText("")
+    attributesList = attributes.split(",\n") #se recogen los atributos introducidos
+    
+    
+    for attribute in attributesList:
+        if "primary key" in attribute.lower():
+            primaryKey = attribute #se guarda la llave primaria
+
+    query = """
+    CREATE TABLE {} (
+        {}
+    );
+    """.format(tableName, attributes) #se crea la query para crear la tabla
+
+    mainNode["name"] = mainBothWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
+
+    for node in nodeList: #se guardan los datos del nodo principal
+        if node["name"] == mainNode["name"]:
+            mainNode["host"] = node["host"]
+            mainNode["database"] = node["database"]
+            mainNode["port"] = node["port"]
+            mainNode["user"] = node["user"]
+            mainNode["password"] = node["password"]
+
+    for node in nodes:
+        if node != mainNode["name"]: #se añaden el resto de nodos al combobox menos el principal
+            bothWindow.cbNodes.addItem(node)
+    
+    bothWindow.show()
+    generateMBTable(query, primaryKey, tableName)
+
+
+def generateMBTable(query,primaryKey, tableName):
+    doConnection(query, mainNode)
+
+    bothWindow.inputTable.setPlainText("""
+    CREATE TABLE {} (
+        {},
+    );
+    """.format(tableName, primaryKey)) #se autocompleta el nombre de la tabla y los atributos para el siguiente nodo
+
+
+def guiSelectNodeB():
+    node = bothWindow.cbNodes.currentText()
+    bothWindow.lstNodes.addItem(node)
+
+
+def guiGoBackB():
+    bothWindow.hide()
+    nodesWindow.show()
+
+    bothWindow.cbNodes.clear()
+    bothWindow.lstNodes.clear()
+    bothWindow.inputTable.setPlainText("")
+
+
+def guiGenerateBothSegmentation():
+    print("Aqui va lo que falta")
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
 nodesWindow.btnVertical.clicked.connect(guiVerticalWindow)
 nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
-nodesWindow.btnDelete.clicked.connect(guiDeleteNodeWindow)
+nodesWindow.btnDelete.clicked.connect(guiDeleteNodeWindow) 
+nodesWindow.btnBoth.clicked.connect(guiMainBothWindow) 
 verticalWindow.btnAddNode.clicked.connect(guiSelectNode)
 verticalWindow.btnGenerate.clicked.connect(guiGenerateVerticalSegmentation)
 verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
@@ -430,6 +524,11 @@ horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
 horizontalWindow.btnGoBack.clicked.connect(guiGoBackH)
 deleteWindow.btnDelete.clicked.connect(guiDeleteNode)
 deleteWindow.btnGoBack.clicked.connect(guiGoBackD)
+mainBothWindow.btnGoBack.clicked.connect(guiGoBackMB)
+mainBothWindow.btnCreate.clicked.connect(guiBothWindow)
+bothWindow.btnAddNode.clicked.connect(guiSelectNodeB)
+bothWindow.btnGoBack.clicked.connect(guiGoBackB)
+bothWindow.btnCreate.clicked.connect(guiGenerateBothSegmentation)
 
 
 # Ejecutable
