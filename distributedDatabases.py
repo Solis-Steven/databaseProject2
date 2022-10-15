@@ -21,6 +21,8 @@ nodesWindow = uic.loadUi("GUI/nodesWindow.ui")
 verticalWindow = uic.loadUi("GUI/verticalWindow.ui")
 horizontalWindow = uic.loadUi("GUI/horizontalWindow.ui")
 mainHorizontalWindow = uic.loadUi("GUI/mainHorizontalWindow.ui")
+mainHorizontalWindow = uic.loadUi("GUI/mainHorizontalWindow.ui")
+deleteWindow = uic.loadUi("GUI/deleteWindow.ui")
 
 """
 Esta funcion abre la ventana para la creacion
@@ -208,6 +210,7 @@ def guiGoBackV():
     verticalWindow.hide()
     verticalWindow.lstNodes.clear()
     verticalWindow.inputTable.setPlainText("")
+    verticalWindow.cbNodes.clear()
     nodesWindow.show()
 
 
@@ -276,11 +279,11 @@ def guiHorizontalWindow():
             mainNode["password"] = node["password"]
 
     for node in nodes:
-        if node != mainNode["name"]:
+        if node != mainNode["name"]: #se añaden el resto de nodos al combobox menos el principal
             horizontalWindow.cbNodes.addItem(node)
     
     horizontalWindow.show()
-    generateMHTable(query, primaryKey, tableName)
+    generateMHTable(query, primaryKey, tableName) #se muestra la gui para crear la tabla en el nodo principal
 
 
 """
@@ -359,6 +362,7 @@ def guiGoBackMH():
     nodesWindow.show()
     mainHorizontalWindow.inputTableName.setText("")
     mainHorizontalWindow.inputTable.setPlainText("")
+    mainHorizontalWindow.cbNodes.clear()
 
 """
 Esta funcion se encarga de darle funcion al boton de volver atras
@@ -369,19 +373,63 @@ def guiGoBackH():
     horizontalWindow.hide()
     nodesWindow.show()
     horizontalWindow.inputTable.setPlainText("")
+    horizontalWindow.cbNodes.clear()
+
+
+def guiDeleteNodeWindow():
+    nodesWindow.hide()
+
+    nodes = []
+    for node in range(nodesWindow.lstInsertedNodes.count()): #se recorre la lista de nodos seleccionados y se añaden a la local
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text())
+    
+    for node in nodes:
+        deleteWindow.cbNodes.addItem(node) #se añaden los nodos creados en la ventana principal al combobox
+
+    deleteWindow.show()
+
+
+def guiDeleteNode():
+    currentNode = deleteWindow.cbNodes.currentText()
+    
+    for i in nodeList:
+        if i["name"] == currentNode:
+            nodeList.remove(i)
+    
+    deleteWindow.cbNodes.clear()
+
+    for node in nodeList:
+        deleteWindow.cbNodes.addItem(node["name"])
+
+    
+def guiGoBackD():
+    deleteWindow.hide()
+
+    nodesWindow.lstInsertedNodes.clear()
+
+    for i in nodeList:
+        nodesWindow.lstInsertedNodes.addItem(i["name"])
+
+
+    nodesWindow.show()
+
+
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
 nodesWindow.btnVertical.clicked.connect(guiVerticalWindow)
+nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
+nodesWindow.btnDelete.clicked.connect(guiDeleteNodeWindow)
 verticalWindow.btnAddNode.clicked.connect(guiSelectNode)
 verticalWindow.btnGenerate.clicked.connect(guiGenerateVerticalSegmentation)
 verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
-nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
 mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
 mainHorizontalWindow.btnGoBack.clicked.connect(guiGoBackMH)
 horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
 horizontalWindow.btnGoBack.clicked.connect(guiGoBackH)
+deleteWindow.btnDelete.clicked.connect(guiDeleteNode)
+deleteWindow.btnGoBack.clicked.connect(guiGoBackD)
 
 
 # Ejecutable
