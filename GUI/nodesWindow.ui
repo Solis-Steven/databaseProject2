@@ -387,6 +387,27 @@ color: rgb(255, 255, 255);
      <string>VERTICAL</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnDelete">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>370</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>DELETE NODE</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

@@ -4,8 +4,6 @@ from conexion_postgresql import *
 # Lista para almacenar los nodos
 nodeList = []
 
-tableName = ""
-primaryKey = ""
 mainNode = {
     "name": "",
     "host": "",
@@ -223,43 +221,53 @@ def guiDeleteSelectedNodes():
     verticalWindow.lstNodes.clear()
 
 
+"""
+Esta funcion se encarga de presentar la ventana para la segmentacion horizontal
+de las tablas en el nodo principal.
+"""
 def guiMainHorizontalWindow():
-    nodesWindow.hide()
+    nodesWindow.hide() 
     nodes = []
-    for node in range(nodesWindow.lstInsertedNodes.count()):
+    for node in range(nodesWindow.lstInsertedNodes.count()): #se recorre la lista de nodos seleccionados y se añaden a la local
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text())
     
     for node in nodes:
-        mainHorizontalWindow.cbNodes.addItem(node)
+        mainHorizontalWindow.cbNodes.addItem(node) #se añaden los nodos creados en la ventana principal al combobox
     mainHorizontalWindow.show()
 
 
+"""
+Esta funcion se encarga de mostrar la interfaz para crear la segmentacion vertical con el nodo
+principal (main)
+"""
 def guiHorizontalWindow():
     mainHorizontalWindow.hide()
 
     nodes = []
     for node in range(nodesWindow.lstInsertedNodes.count()):
-        nodes.append(nodesWindow.lstInsertedNodes.item(node).text())    
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
+    global tableName #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
+    global primaryKey
     tableName = mainHorizontalWindow.inputTableName.text()
     attributes = mainHorizontalWindow.inputTable.toPlainText()
     mainHorizontalWindow.inputTable.setPlainText("")
-    attributesList = attributes.split(",\n")
+    attributesList = attributes.split(",\n") #se recogen los atributos introducidos
     
     
     for attribute in attributesList:
         if "primary key" in attribute.lower():
-            primaryKey = attribute
+            primaryKey = attribute #se guarda la llave primaria
 
     query = """
     CREATE TABLE {} (
         {}
     );
-    """.format(tableName, attributes)
+    """.format(tableName, attributes) #se crea la query para crear la tabla
 
-    mainNode["name"] = mainHorizontalWindow.cbNodes.currentText()
+    mainNode["name"] = mainHorizontalWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
-    for node in nodeList:
+    for node in nodeList: #se guardan los datos del nodo principal
         if node["name"] == mainNode["name"]:
             mainNode["host"] = node["host"]
             mainNode["database"] = node["database"]
@@ -275,6 +283,10 @@ def guiHorizontalWindow():
     generateMHTable(query, primaryKey, tableName)
 
 
+"""
+Esta funcion se encarga de crear la tabla para la segmentacion vertical
+en el nodo principal
+"""
 def generateMHTable(query,primaryKey, tableName):
     doConnection(query, mainNode)
 
@@ -282,9 +294,14 @@ def generateMHTable(query,primaryKey, tableName):
     CREATE TABLE {} (
         {},
     );
-    """.format(tableName, primaryKey))
+    """.format(tableName, primaryKey)) #se autocompleta el nombre de la tabla y los atributos para el siguiente nodo
 
 
+"""
+Esta funcion se encarga de ir creando la tabla con segmentacion vertical
+en los nodos secundarios y creando de una vez las conexiones hacia el nodo
+principal
+"""
 def guiHorizontalWindow2():
 
     table = horizontalWindow.inputTable.toPlainText()
@@ -300,7 +317,7 @@ def guiHorizontalWindow2():
     }
 
 
-    for i in nodeList:
+    for i in nodeList: #se obtienen los datos del nodo
         if i["name"] == nodeName:
             node["name"] = i["name"]
             node["host"] = i["host"]
@@ -310,11 +327,11 @@ def guiHorizontalWindow2():
             node["password"] = i["password"] 
     doConnection(table, node) #se crea la conexion con los datos del nodo
 
-    horizontalWindow.inputTable.setPlainText("""
+    horizontalWindow.inputTable.setPlainText(""" 
     CREATE TABLE {} (
         {},
     );
-    """.format(tableName, primaryKey))
+    """.format(tableName, primaryKey)) #se crea la tabla con los atributos
 
     query = """
     create extension postgres_fdw;
@@ -329,7 +346,29 @@ def guiHorizontalWindow2():
     """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
     mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
 
-    doConnection(query,node)
+    doConnection(query,node) #se crea la query para los data wrappers y el user mapping
+
+
+"""
+Esta funcion se encarga de darle funcion al boton de volver atras
+"go back" en la interfaz grafica en la parte de creacion de tabla
+en el nodo principal
+"""
+def guiGoBackMH():
+    mainHorizontalWindow.hide()
+    nodesWindow.show()
+    mainHorizontalWindow.inputTableName.setText("")
+    mainHorizontalWindow.inputTable.setPlainText("")
+
+"""
+Esta funcion se encarga de darle funcion al boton de volver atras
+"go back" en la interfaz grafica en la parte de creacion de tabla
+en los nodos secundarios
+"""
+def guiGoBackH():
+    horizontalWindow.hide()
+    nodesWindow.show()
+    horizontalWindow.inputTable.setPlainText("")
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
@@ -340,7 +379,9 @@ verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
 nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
 mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
+mainHorizontalWindow.btnGoBack.clicked.connect(guiGoBackMH)
 horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
+horizontalWindow.btnGoBack.clicked.connect(guiGoBackH)
 
 
 # Ejecutable
