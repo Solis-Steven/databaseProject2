@@ -34,9 +34,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>60</x>
       <y>0</y>
-      <width>651</width>
+      <width>691</width>
       <height>91</height>
      </rect>
     </property>
@@ -58,11 +58,11 @@ color: black;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 20pt &quot;Arial&quot;;
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
 color: black;</string>
     </property>
     <property name="text">
-     <string>Table</string>
+     <string>Table:</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblNodes">
@@ -148,6 +148,26 @@ color: rgb(255, 255, 255);
     </property>
     <property name="styleSheet">
      <string notr="true">font: 14pt &quot;Arial&quot;;</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputTableName">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>130</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 10pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Table name</string>
     </property>
    </widget>
   </widget>

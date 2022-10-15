@@ -4,6 +4,17 @@ from conexion_postgresql import *
 # Lista para almacenar los nodos
 nodeList = []
 
+tableName = ""
+primaryKey = ""
+mainNode = {
+    "name": "",
+    "host": "",
+    "port": "",
+    "database": "",
+    "user": "",
+    "password": ""
+}
+
 # Iniciamos el programa
 app = QtWidgets.QApplication([])
 
@@ -62,6 +73,22 @@ def guiAddNode():
     }
 
     nodeList.append(node)
+"""
+Esta funcion establece a coneccion con el servidor
+localizado en la base de datos con los datos brindados
+por el usuario
+"""
+def doConnection(query, node):
+    connection = makeConnection(node["mainHost"], 
+                                node["mainPort"], 
+                                node["mainUser"], 
+                                node["mainPassword"], 
+                                node["mainDbName"]) #se crea la conexion con los datos del n
+  
+    connection.autocommit = True #se habilita los commits automaticos
+    cursor = connection.cursor() #se crea cursor para ejecutar queries
+    cursor.execute(query) #se ejecuta el string con la creacion de la tabla
+    cursor.close()
 
 
 """
@@ -86,12 +113,12 @@ def guiGenerateVerticalSegmentation():
     verticalWindow.inputTable.setPlainText("")
 
     nodes = []
-    for node in range(verticalWindow.lstNodes.count()): 
+    for node in range(verticalWindow.lstNodes.count()): #se recorre la ventana con los nodos
 
         readedNode = verticalWindow.lstNodes.item(node).text()
         readedNode = readedNode.split()
 
-        if len(readedNode) > 1:
+        if len(readedNode) > 1:  #se pregunta si es el main node en ese caso lo guarda con main true
             node = {
                 "name": readedNode[0],
                 "main": True
@@ -105,7 +132,7 @@ def guiGenerateVerticalSegmentation():
         nodes.append(node)
     
     verticalWindow.lstNodes.clear()
-    generateVTables(nodes, table)
+    generateVTables(nodes, table) #se llama a la funcion para general las tablas con segmentacion vertical
     
 
 """
@@ -209,42 +236,76 @@ def guiMainHorizontalWindow():
 def guiHorizontalWindow():
     mainHorizontalWindow.hide()
 
-    table = mainHorizontalWindow.inputTable.toPlainText()
+    tableName = mainHorizontalWindow.inputTableName.text()
+    attributes = mainHorizontalWindow.inputTable.toPlainText()
     mainHorizontalWindow.inputTable.setPlainText("")
+    attributesList = attributes.split(",\n")
+    
+    
+    for attribute in attributesList:
+        if "primary key" in attribute.lower():
+            primaryKey = attribute
 
-    mainNode = {
-        "mainName": mainHorizontalWindow.cbNodes.currentText(),
-        "mainHost": "",
-        "mainDbName": "",  #se declaran los atributos del nodo principal para usarlos posterior
-        "mainPort": "",     # en los data wrappers
-        "mainUser": "",
-        "mainPassword": ""
-    }
+    query = """
+    CREATE TABLE {} (
+        {}
+    );
+    """.format(tableName, attributes)
+
+    mainNode["mainName"] = mainHorizontalWindow.cbNodes.currentText()
 
     for node in nodeList:
         if node["name"] == mainNode["mainName"]:
-            mainNode["mainHost"] = node["host"]
+            # mainNode["mainHost"] = node["host"]
             mainNode["mainDbName"] = node["database"]
             mainNode["mainPort"] = node["port"]
             mainNode["mainUser"] = node["user"]
             mainNode["mainPassword"] = node["password"]
     
     horizontalWindow.show()
-    generateMHTable(table, mainNode)
+    generateMHTable(query)
 
 
-def generateMHTable(table, mainNode):
-    connection = makeConnection(mainNode["mainHost"], 
-                                mainNode["mainPort"], 
-                                mainNode["mainUser"], 
-                                mainNode["mainPassword"], 
-                                mainNode["mainDbName"]) #se crea la conexion con los datos del nodo
-  
-    connection.autocommit = True #se habilita los commits automaticos
-    cursor = connection.cursor() #se crea cursor para ejecutar queries
-    cursor.execute(table) #se ejecuta el string con la creacion de la tabla
-    cursor.close() 
+def generateMHTable(query):
+    doConnection(query, mainNode)
 
+    horizontalWindow.inputTable.setPlainText("""
+    CREATE TABLE {} (
+        {},
+    );
+    """.format(tableName, primaryKey))
+
+
+def guiHorizontalWindow(query):
+
+    table = horizontalWindow.inputTable.toPlainText()
+    nodeName = horizontalWindow.cbNodes.currentText() 
+
+    node = {
+        "name": "",
+        "host": "",
+        "port": "",
+        "database": "",
+        "user": "",
+        "password": ""
+    }
+
+    for i in nodeList:
+        if i["name"] == nodeName:
+            node["name"] = i["name"]
+            node["host"] = i["host"]
+            node["port"] = i["port"]
+            node["database"] = i["database"]
+            node["user"] = i["user"]
+            node["password"] = i["password"]
+            
+    doConnection(query, node) #se crea la conexion con los datos del nodo
+
+    horizontalWindow.inputTable.setPlainText("""
+    CREATE TABLE {} (
+        {},
+    );
+    """.format(tableName, primaryKey))
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
@@ -255,6 +316,7 @@ verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
 nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
 mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
+horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
 
 
 # Ejecutable
