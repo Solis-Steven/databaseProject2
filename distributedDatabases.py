@@ -10,6 +10,8 @@ app = QtWidgets.QApplication([])
 # Cargamos los archivos de la GUI
 nodesWindow = uic.loadUi("GUI/nodesWindow.ui")
 verticalWindow = uic.loadUi("GUI/verticalWindow.ui")
+horizontalWindow = uic.loadUi("GUI/horizontalWindow.ui")
+mainHorizontalWindow = uic.loadUi("GUI/mainHorizontalWindow.ui")
 
 """
 Esta funcion abre la ventana para la creacion
@@ -103,7 +105,7 @@ def guiGenerateVerticalSegmentation():
         nodes.append(node)
     
     verticalWindow.lstNodes.clear()
-    generateTables(nodes, table)
+    generateVTables(nodes, table)
     
 
 """
@@ -114,7 +116,7 @@ Parametros:
     nodes -- Lista de los nodos seleccionados por el usuario
     table -- Tabla que sera creada con segmentacion vertical 
 """
-def generateTables(nodes, table):
+def generateVTables(nodes, table):
     mainName = "" 
     mainHost = ""
     maindDbName = ""  #se declaran los atributos del nodo principal para usarlos posterior
@@ -164,9 +166,12 @@ def generateTables(nodes, table):
                         CREATE USER MAPPING FOR postgres
                         SERVER {}_postgres_fdw
                         OPTIONS (user '{}', password '{}');
-                        """.format(mainName, mainHost, maindDbName, mainPort, mainName, mainUser, mainPassword)
+                        """.format(mainName, 
+                                   mainHost, 
+                                   maindDbName, 
+                                   mainPort, mainName, mainUser, mainPassword)
                     )
-                    cursor.close()
+                    cursor.close() 
         
             
 """
@@ -190,6 +195,57 @@ def guiDeleteSelectedNodes():
     verticalWindow.lstNodes.clear()
 
 
+def guiMainHorizontalWindow():
+    nodesWindow.hide()
+    nodes = []
+    for node in range(nodesWindow.lstInsertedNodes.count()):
+        nodes.append(nodesWindow.lstInsertedNodes.item(node).text())
+    
+    for node in nodes:
+        mainHorizontalWindow.cbNodes.addItem(node)
+    mainHorizontalWindow.show()
+
+
+def guiHorizontalWindow():
+    mainHorizontalWindow.hide()
+
+    table = mainHorizontalWindow.inputTable.toPlainText()
+    mainHorizontalWindow.inputTable.setPlainText("")
+
+    mainNode = {
+        "mainName": mainHorizontalWindow.cbNodes.currentText(),
+        "mainHost": "",
+        "mainDbName": "",  #se declaran los atributos del nodo principal para usarlos posterior
+        "mainPort": "",     # en los data wrappers
+        "mainUser": "",
+        "mainPassword": ""
+    }
+
+    for node in nodeList:
+        if node["name"] == mainNode["mainName"]:
+            mainNode["mainHost"] = node["host"]
+            mainNode["maindDbName"] = node["database"]
+            mainNode["mainPort"] = node["port"]
+            mainNode["mainUser"] = node["user"]
+            mainNode["mainPassword"] = node["password"]
+    
+    horizontalWindow.show()
+    generateHTable(table, mainNode)
+
+
+def generateMHTable(table, mainNode):
+    connection = makeConnection(mainNode["mainHost"], 
+                                mainNode["mainPort"], 
+                                mainNode["mainUser"], 
+                                mainNode["mainPassword"], 
+                                mainNode["mainDbName"]) #se crea la conexion con los datos del nodo
+  
+    connection.autocommit = True #se habilita los commits automaticos
+    cursor = connection.cursor() #se crea cursor para ejecutar queries
+    cursor.execute(table) #se ejecuta el string con la creacion de la tabla
+    cursor.close() 
+
+
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
 nodesWindow.btnVertical.clicked.connect(guiVerticalWindow)
@@ -197,6 +253,8 @@ verticalWindow.btnAddNode.clicked.connect(guiSelectNode)
 verticalWindow.btnGenerate.clicked.connect(guiGenerateVerticalSegmentation)
 verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
+nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
+mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
 
 
 # Ejecutable
