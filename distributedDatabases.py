@@ -224,13 +224,13 @@ def guiHorizontalWindow():
     for node in nodeList:
         if node["name"] == mainNode["mainName"]:
             mainNode["mainHost"] = node["host"]
-            mainNode["maindDbName"] = node["database"]
+            mainNode["mainDbName"] = node["database"]
             mainNode["mainPort"] = node["port"]
             mainNode["mainUser"] = node["user"]
             mainNode["mainPassword"] = node["password"]
     
     horizontalWindow.show()
-    generateHTable(table, mainNode)
+    generateMHTable(table, mainNode)
 
 
 def generateMHTable(table, mainNode):
