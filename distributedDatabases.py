@@ -79,7 +79,7 @@ localizado en la base de datos con los datos brindados
 por el usuario
 """
 def doConnection(query, node):
-    print(node)
+    #print(node)
     connection = makeConnection(node["host"], 
                                 node["port"], 
                                 node["user"], 
@@ -285,7 +285,7 @@ def generateMHTable(query,primaryKey, tableName):
     """.format(tableName, primaryKey))
 
 
-def guiHorizontalWindow2(tableName,primaryKey):
+def guiHorizontalWindow2():
 
     table = horizontalWindow.inputTable.toPlainText()
     nodeName = horizontalWindow.cbNodes.currentText()
@@ -315,6 +315,21 @@ def guiHorizontalWindow2(tableName,primaryKey):
         {},
     );
     """.format(tableName, primaryKey))
+
+    query = """
+    create extension postgres_fdw;
+
+    create server {}_postgres_fdw
+    foreign data wrapper postgres_fdw
+    options (host '{}', dbname '{}', port '{}');
+
+    create user mapping for postgres
+    server {}_postgres_fdw
+    options(user '{}', password '{}');
+    """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
+    mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
+
+    doConnection(query,node)
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
