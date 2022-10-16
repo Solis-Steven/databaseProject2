@@ -4,8 +4,9 @@ from conexion_postgresql import *
 # Lista para almacenar los nodos
 nodeList = []
 
-global tableName #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
-global primaryKey
+tableName = "" #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
+primaryKey = ""
+
 
 mainNode = {
     "name": "",
@@ -255,6 +256,7 @@ def guiHorizontalWindow():
     for node in range(nodesWindow.lstInsertedNodes.count()):
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
+    global tableName
     tableName = mainHorizontalWindow.inputTableName.text()
     attributes = mainHorizontalWindow.inputTable.toPlainText()
     mainHorizontalWindow.inputTable.setPlainText("")
@@ -264,6 +266,7 @@ def guiHorizontalWindow():
     
     for attribute in attributesList:
         if "primary key" in attribute.lower():
+            global primaryKey 
             primaryKey = attribute #se guarda la llave primaria
 
     query = """
@@ -446,6 +449,7 @@ def guiBothWindow():
     for node in range(nodesWindow.lstInsertedNodes.count()):
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
+    global tableName
     tableName = mainBothWindow.inputTableName.text()
     attributes = mainBothWindow.inputTable.toPlainText()
     mainBothWindow.inputTable.setPlainText("")
@@ -455,6 +459,7 @@ def guiBothWindow():
     
     for attribute in attributesList:
         if "primary key" in attribute.lower():
+            global primaryKey
             primaryKey = attribute #se guarda la llave primaria
 
     query = """
@@ -462,7 +467,6 @@ def guiBothWindow():
         {}
     );
     """.format(tableName, attributes) #se crea la query para crear la tabla
-
     mainNode["name"] = mainBothWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
     for node in nodeList: #se guardan los datos del nodo principal
@@ -506,7 +510,58 @@ def guiGoBackB():
 
 
 def guiGenerateBothSegmentation():
-    print("Aqui va lo que falta")
+
+    table = bothWindow.inputTable.toPlainText()
+    nodes = []
+    for node in range(bothWindow.lstNodes.count()): #se recorre la ventana con los nodos
+        readedNode = bothWindow.lstNodes.item(node).text()
+        nodes.append(readedNode)
+
+    node = {
+        "name": "",
+        "host": "",
+        "port": "",
+        "database": "",
+        "user": "",
+        "password": ""
+    }
+    
+
+    for n in nodes:
+        for i in nodeList: #se obtienen los datos del nodo
+            if i["name"] == n:
+                node["name"] = i["name"]
+                node["host"] = i["host"]
+                node["port"] = i["port"]
+                node["database"] = i["database"]
+                node["user"] = i["user"]
+                node["password"] = i["password"] 
+        doConnection(table, node) #se crea la conexion con los datos del nodo
+        query = """
+        create extension postgres_fdw;
+
+        create server {}_postgres_fdw
+        foreign data wrapper postgres_fdw
+        options (host '{}', dbname '{}', port '{}');
+
+        create user mapping for postgres
+        server {}_postgres_fdw
+        options(user '{}', password '{}');
+        """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
+        mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
+        doConnection(query,node) #se crea la query para los data wrappers y el user mapping
+    
+    bothWindow.inputTable.setPlainText(""" 
+    CREATE TABLE {} (
+        {},
+    );
+    """.format(tableName, primaryKey)) #se crea la tabla con los atributos
+    bothWindow.lstNodes.clear()
+    
+        
+   
+
+
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
