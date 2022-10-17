@@ -191,7 +191,7 @@ def generateVTables(nodes, table):
                     cursor = connection.cursor()
                     cursor.execute(table) 
                     cursor.execute("""
-                        create extension postgres_fdw;
+                        create extension if not exists postgres_fdw;
 
                         CREATE SERVER {}_postgres_fdw
                         FOREIGN DATA WRAPPER postgres_fdw
@@ -344,7 +344,7 @@ def guiHorizontalWindow2():
     """.format(tableName, primaryKey)) #se crea la tabla con los atributos
 
     query = """
-    create extension postgres_fdw;
+    create extension if not exists  postgres_fdw;
 
     create server {}_postgres_fdw
     foreign data wrapper postgres_fdw
@@ -538,7 +538,7 @@ def guiGenerateBothSegmentation():
                 node["password"] = i["password"] 
         doConnection(table, node) #se crea la conexion con los datos del nodo
         query = """
-        create extension postgres_fdw;
+        create extension if not exists postgres_fdw;
 
         create server {}_postgres_fdw
         foreign data wrapper postgres_fdw
