@@ -197,7 +197,7 @@ def generateVTables(nodes, table):
                         FOREIGN DATA WRAPPER postgres_fdw
                         OPTIONS(host '{}', dbname '{}', port '{}');
 
-                        CREATE USER MAPPING FOR postgres
+                        CREATE USER MAPPING IF NOT EXISTS FOR postgres
                         SERVER {}_postgres_fdw
                         OPTIONS (user '{}', password '{}');
                         """.format(mainName, 
@@ -350,7 +350,7 @@ def guiHorizontalWindow2():
     foreign data wrapper postgres_fdw
     options (host '{}', dbname '{}', port '{}');
 
-    create user mapping for postgres
+    create user mapping if not exists for postgres
     server {}_postgres_fdw
     options(user '{}', password '{}');
     """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
@@ -544,7 +544,7 @@ def guiGenerateBothSegmentation():
         foreign data wrapper postgres_fdw
         options (host '{}', dbname '{}', port '{}');
 
-        create user mapping for postgres
+        create user mapping if not exists for postgres
         server {}_postgres_fdw
         options(user '{}', password '{}');
         """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
