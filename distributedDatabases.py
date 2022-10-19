@@ -1,13 +1,15 @@
+
+import random
 from PyQt5 import QtWidgets, uic
 from conexion_postgresql import *
 
 # Lista para almacenar los nodos
 nodeList = []
 
-global attributesList
+
 attributesList = []
 
-global mainNode
+
 mainNode = {
     "name": "",
     "host": "",
@@ -85,7 +87,6 @@ localizado en la base de datos con los datos brindados
 por el usuario
 """
 def doConnection(query, node):
-    #print(node)
     connection = makeConnection(node["host"], 
                                 node["port"], 
                                 node["user"], 
@@ -142,13 +143,15 @@ def guiGenerateVerticalSegmentation():
     
     table = "CREATE TABLE {} (\n".format(tableName)
 
+    global attributesList
     for i in attributesList:
         if i["primaryKey"]:
             table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
-    table += ");"
+    table = table[:len(table)-2]
+    table += "\n);"
 
     verticalWindow.inputName.setText("")
     verticalWindow.inputAttributeName.setText("")
@@ -218,6 +221,7 @@ def generateVTables(nodes, table):
                     cursor.execute(table) #se ejecuta el string con la creacion de la tabla
                     cursor.close() 
                 else:
+                    randomID= str(random.randint(500, 50000))
                     connection = makeConnection(searchedNode["host"], # se establece la coneccion con los datos
                                                 searchedNode["port"], 
                                                 searchedNode["user"],
@@ -229,17 +233,18 @@ def generateVTables(nodes, table):
                     cursor.execute("""
                         create extension if not exists postgres_fdw;
 
-                        CREATE SERVER {}_postgres_fdw
+                        CREATE SERVER {}{}_postgres_fdw
                         FOREIGN DATA WRAPPER postgres_fdw
                         OPTIONS(host '{}', dbname '{}', port '{}');
 
                         CREATE USER MAPPING IF NOT EXISTS FOR postgres
-                        SERVER {}_postgres_fdw
+                        SERVER {}{}_postgres_fdw
                         OPTIONS (user '{}', password '{}');
-                        """.format(mainName, 
+                        """.format(mainName,
+                                   randomID,
                                    mainHost, 
                                    maindDbName, 
-                                   mainPort, mainName, mainUser, mainPassword)
+                                   mainPort, mainName,randomID, mainUser, mainPassword)
                     )
                     cursor.close() 
         
@@ -298,15 +303,18 @@ def guiHorizontalWindow():
     
 
     query = "CREATE TABLE {} (\n".format(tableName) #se crea la query para crear la tabla
-
+    global attributesList
     for i in attributesList:
         if i["primaryKey"]:
             query += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             query += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
-    query += ");"
+    
+    query = query[:len(query)-2]
+    query += "\n);"
 
+    global mainNode
     mainNode["name"] = mainHorizontalWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
     for node in nodeList: #se guardan los datos del nodo principal
@@ -323,6 +331,7 @@ def guiHorizontalWindow():
     
     horizontalWindow.show()
     doConnection(query, mainNode)
+    attributesList = []
 
 
 """
@@ -356,30 +365,33 @@ def guiHorizontalWindow2():
 
     table = "CREATE TABLE {} (\n".format(tableName)
 
+    global attributesList
     for i in attributesList:
         if i["primaryKey"]:
             table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
-    table += ");"
+    table = table[:len(table)-2]
+    table += "\n);"
 
     doConnection(table, node) #se crea la conexion con los datos del nodo
     horizontalWindow.inputName.setText("")
     horizontalWindow.inputAttributeName.setText("")
 
+    randomID = str(random.randint(500, 50000))
     query = """
     create extension if not exists  postgres_fdw;
 
-    create server {}_postgres_fdw
+    create server {}{}_postgres_fdw
     foreign data wrapper postgres_fdw
     options (host '{}', dbname '{}', port '{}');
 
     create user mapping if not exists for postgres
-    server {}_postgres_fdw
+    server {}{}_postgres_fdw
     options(user '{}', password '{}');
-    """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
-    mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
+    """.format(mainNode["name"], randomID, mainNode["host"], mainNode["database"], 
+    mainNode["port"], mainNode["name"],randomID, mainNode["user"], mainNode["password"])
 
     doConnection(query,node) #se crea la query para los data wrappers y el user mapping
     attributesList = []
@@ -529,14 +541,18 @@ def guiBothWindow():
 
     table = "CREATE TABLE {}(\n".format(tableName)
 
+    global attributesList
     for i in attributesList:
         if i["primaryKey"]:
             table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
-    table += ");"
+    
+    table = table[:len(table)-2]
+    table += "\n);"
 
+    global mainNode
     mainNode["name"] = mainBothWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
     for node in nodeList: #se guardan los datos del nodo principal
@@ -552,7 +568,7 @@ def guiBothWindow():
             bothWindow.cbNodes.addItem(node)
     
     bothWindow.show()
-    doConnection(query, mainNode)
+    doConnection(table, mainNode)
     mainBothWindow.inputName.setText("")
     mainBothWindow.inputAttributeName.setText("")
     mainBothWindow.lstInsertedNodes.clear()
@@ -602,14 +618,15 @@ def guiGenerateBothSegmentation():
     tableName = bothWindow.inputName.text()
 
     table = "CREATE TABLE {} (\n".format(tableName)
-
+    global attributesList
     for i in attributesList:
         if i["primaryKey"]:
             table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
-    table += ");"
+    table = table[:len(table)-2]
+    table += "\n);"
 
 
     nodes = []
@@ -636,22 +653,24 @@ def guiGenerateBothSegmentation():
                 node["user"] = i["user"]
                 node["password"] = i["password"] 
         doConnection(table, node) #se crea la conexion con los datos del nodo
+        randomID = str(random.randint(500, 50000))
         query = """
         create extension if not exists postgres_fdw;
 
-        create server {}_postgres_fdw
+        create server {}{}_postgres_fdw
         foreign data wrapper postgres_fdw
         options (host '{}', dbname '{}', port '{}');
 
         create user mapping if not exists for postgres
-        server {}_postgres_fdw
+        server {}{}_postgres_fdw
         options(user '{}', password '{}');
-        """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
-        mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
+        """.format(mainNode["name"], randomID, mainNode["host"], mainNode["database"], 
+        mainNode["port"], mainNode["name"], randomID, mainNode["user"], mainNode["password"])
         doConnection(query,node) #se crea la query para los data wrappers y el user mapping
 
     bothWindow.lstNodes.clear()
     nodeList = []
+    attributesList = []
     
         
 def guiAddAttributeB():
@@ -706,5 +725,5 @@ bothWindow.btnAddAttribute.clicked.connect(guiAddAttributeB)
 
 
 # Ejecutable
-mainBothWindow.show()
+nodesWindow.show()
 app.exec()
