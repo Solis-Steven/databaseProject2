@@ -1,0 +1,2 @@
+
+    attributeType = mainHorizontalWindow.cbAttributesType.currentText()

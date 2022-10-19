@@ -4,8 +4,8 @@ from conexion_postgresql import *
 # Lista para almacenar los nodos
 nodeList = []
 
-tableName = "" #se crean variables globales tanto para el nombre de la tabla como para el de la llave primaria
-primaryKey = ""
+global attributesList
+attributesList = []
 
 
 mainNode = {
@@ -110,14 +110,48 @@ def guiSelectNode():
     else:
         verticalWindow.lstNodes.addItem(node)
 
+
+def guiAddAttributeV():
+    attributeName = verticalWindow.inputAttributeName.text()
+    attributeType = verticalWindow.cbAttributesType.currentText()
+    primaryKey = verticalWindow.chbPrimaryKey.isChecked()
+
+    if primaryKey:
+        verticalWindow.lstAttributes.addItem("{} {} (pk)".format(attributeName, attributeType))
+    else:
+        verticalWindow.lstAttributes.addItem("{} {}".format(attributeName, attributeType))
+
+    verticalWindow.inputAttributeName.setText("")
+    verticalWindow.chbPrimaryKey.setChecked(False)
+
+    attribute = {
+        "attributeName": attributeName,
+        "attributeType": attributeType,
+        "primaryKey": primaryKey
+    }
+
+    attributesList.append(attribute)
+
 """
 Esta funcion va a obtener los datos introducidos 
 por el usuario y los cuales a partir de ellos,
 va a generar la segmentacion vertical
 """
 def guiGenerateVerticalSegmentation():
-    table = verticalWindow.inputTable.toPlainText()
-    verticalWindow.inputTable.setPlainText("")
+    tableName = verticalWindow.inputName.text()
+    
+    table = "CREATE TABLE {} (\n".format(tableName)
+
+    for i in attributesList:
+        if i["primaryKey"]:
+            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+        else:
+            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+
+    table += ");"
+
+    verticalWindow.inputName.setText("")
+    verticalWindow.inputAttributeName.setText("")
 
     nodes = []
     for node in range(verticalWindow.lstNodes.count()): #se recorre la ventana con los nodos
@@ -139,6 +173,7 @@ def guiGenerateVerticalSegmentation():
         nodes.append(node)
     
     verticalWindow.lstNodes.clear()
+    verticalWindow.lstAttributes.clear()
     generateVTables(nodes, table) #se llama a la funcion para general las tablas con segmentacion vertical
     
 
@@ -256,24 +291,18 @@ def guiHorizontalWindow():
     for node in range(nodesWindow.lstInsertedNodes.count()):
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
-    global tableName
-    tableName = mainHorizontalWindow.inputTableName.text()
-    attributes = mainHorizontalWindow.inputTable.toPlainText()
-    mainHorizontalWindow.inputTable.setPlainText("")
-    mainHorizontalWindow.inputTableName.setText("")
-    attributesList = attributes.split(",\n") #se recogen los atributos introducidos
+    tableName = mainHorizontalWindow.inputName.text()
     
-    
-    for attribute in attributesList:
-        if "primary key" in attribute.lower():
-            global primaryKey 
-            primaryKey = attribute #se guarda la llave primaria
 
-    query = """
-    CREATE TABLE {} (
-        {}
-    );
-    """.format(tableName, attributes) #se crea la query para crear la tabla
+    query = "CREATE TABLE {} (\n".format(tableName) #se crea la query para crear la tabla
+
+    for i in attributesList:
+        if i["primaryKey"]:
+            query += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+        else:
+            query += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+
+    query += ");"
 
     mainNode["name"] = mainHorizontalWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
@@ -290,21 +319,7 @@ def guiHorizontalWindow():
             horizontalWindow.cbNodes.addItem(node)
     
     horizontalWindow.show()
-    generateMHTable(query, primaryKey, tableName) #se muestra la gui para crear la tabla en el nodo principal
-
-
-"""
-Esta funcion se encarga de crear la tabla para la segmentacion vertical
-en el nodo principal
-"""
-def generateMHTable(query,primaryKey, tableName):
     doConnection(query, mainNode)
-
-    horizontalWindow.inputTable.setPlainText("""
-    CREATE TABLE {} (
-        {},
-    );
-    """.format(tableName, primaryKey)) #se autocompleta el nombre de la tabla y los atributos para el siguiente nodo
 
 
 """
@@ -314,7 +329,7 @@ principal
 """
 def guiHorizontalWindow2():
 
-    table = horizontalWindow.inputTable.toPlainText()
+    tableName = horizontalWindow.inputName.text()
     nodeName = horizontalWindow.cbNodes.currentText()
 
     node = {
@@ -335,13 +350,20 @@ def guiHorizontalWindow2():
             node["database"] = i["database"]
             node["user"] = i["user"]
             node["password"] = i["password"] 
-    doConnection(table, node) #se crea la conexion con los datos del nodo
 
-    horizontalWindow.inputTable.setPlainText(""" 
-    CREATE TABLE {} (
-        {},
-    );
-    """.format(tableName, primaryKey)) #se crea la tabla con los atributos
+    table = "CREATE TABLE {} (\n".format(tableName)
+
+    for i in attributesList:
+        if i["primaryKey"]:
+            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+        else:
+            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+
+    table += ");"
+
+    doConnection(table, node) #se crea la conexion con los datos del nodo
+    horizontalWindow.inputName.setText("")
+    horizontalWindow.inputAttributeName.setText("")
 
     query = """
     create extension if not exists  postgres_fdw;
@@ -357,6 +379,7 @@ def guiHorizontalWindow2():
     mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
 
     doConnection(query,node) #se crea la query para los data wrappers y el user mapping
+    attributesList = []
 
 
 """
@@ -371,6 +394,28 @@ def guiGoBackMH():
     mainHorizontalWindow.inputTable.setPlainText("")
     mainHorizontalWindow.cbNodes.clear()
 
+
+def guiAddAttributeMH():
+    attributeName = mainHorizontalWindow.inputAttributeName.text()
+    attributeType = mainHorizontalWindow.cbAttributesType.currentText()
+    primaryKey = mainHorizontalWindow.chbPrimaryKey.isChecked()
+
+    if primaryKey:
+        mainHorizontalWindow.lstInsertedNodes.addItem("{} {} (pk)".format(attributeName, attributeType))
+    else:
+        mainHorizontalWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
+
+    mainHorizontalWindow.inputAttributeName.setText("")
+    mainHorizontalWindow.chbPrimaryKey.setChecked(False)
+
+    attribute = {
+        "attributeName": attributeName,
+        "attributeType": attributeType,
+        "primaryKey": primaryKey
+    }
+
+    attributesList.append(attribute)
+
 """
 Esta funcion se encarga de darle funcion al boton de volver atras
 "go back" en la interfaz grafica en la parte de creacion de tabla
@@ -381,6 +426,29 @@ def guiGoBackH():
     nodesWindow.show()
     horizontalWindow.inputTable.setPlainText("")
     horizontalWindow.cbNodes.clear()
+
+
+def guiAddAttributeH():
+    attributeName = horizontalWindow.inputAttributeName.text()
+    attributeType = horizontalWindow.cbAttributesType.currentText()
+    primaryKey = horizontalWindow.chbPrimaryKey.isChecked()
+
+    if primaryKey:
+        horizontalWindow.lstInsertedNodes.addItem("{} {} (pk)".format(attributeName, attributeType))
+    else:
+        horizontalWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
+
+    horizontalWindow.inputAttributeName.setText("")
+    horizontalWindow.chbPrimaryKey.setChecked(False)
+
+    attribute = {
+        "attributeName": attributeName,
+        "attributeType": attributeType,
+        "primaryKey": primaryKey
+    }
+
+    attributesList.append(attribute)
+    
 
 
 def guiDeleteNodeWindow():
@@ -570,13 +638,16 @@ nodesWindow.btnHorizontal.clicked.connect(guiMainHorizontalWindow)
 nodesWindow.btnDelete.clicked.connect(guiDeleteNodeWindow) 
 nodesWindow.btnBoth.clicked.connect(guiMainBothWindow) 
 verticalWindow.btnAddNode.clicked.connect(guiSelectNode)
+verticalWindow.btnAddAttribute.clicked.connect(guiAddAttributeV)
 verticalWindow.btnGenerate.clicked.connect(guiGenerateVerticalSegmentation)
 verticalWindow.btnGoBack.clicked.connect(guiGoBackV)
 verticalWindow.btnDelete.clicked.connect(guiDeleteSelectedNodes)
 mainHorizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow)
 mainHorizontalWindow.btnGoBack.clicked.connect(guiGoBackMH)
+mainHorizontalWindow.btnAddAttribute.clicked.connect(guiAddAttributeMH)
 horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
 horizontalWindow.btnGoBack.clicked.connect(guiGoBackH)
+horizontalWindow.btnAddAttribute.clicked.connect(guiAddAttributeH)
 deleteWindow.btnDelete.clicked.connect(guiDeleteNode)
 deleteWindow.btnGoBack.clicked.connect(guiGoBackD)
 mainBothWindow.btnGoBack.clicked.connect(guiGoBackMB)
@@ -587,5 +658,5 @@ bothWindow.btnCreate.clicked.connect(guiGenerateBothSegmentation)
 
 
 # Ejecutable
-nodesWindow.show()
+mainHorizontalWindow.show()
 app.exec()
