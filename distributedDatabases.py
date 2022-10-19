@@ -7,7 +7,7 @@ nodeList = []
 global attributesList
 attributesList = []
 
-
+global mainNode
 mainNode = {
     "name": "",
     "host": "",
@@ -174,6 +174,7 @@ def guiGenerateVerticalSegmentation():
     
     verticalWindow.lstNodes.clear()
     verticalWindow.lstAttributes.clear()
+    attributesList = []
     generateVTables(nodes, table) #se llama a la funcion para general las tablas con segmentacion vertical
     
 
@@ -250,8 +251,10 @@ y abre la ventana de nodos es decir vuelve a atras
 def guiGoBackV():
     verticalWindow.hide()
     verticalWindow.lstNodes.clear()
-    verticalWindow.inputTable.setPlainText("")
+    verticalWindow.lstAttributes.clear()
     verticalWindow.cbNodes.clear()
+    verticalWindow.inputName.setText("")
+    verticalWindow.inputAttributeName.setText("")
     nodesWindow.show()
 
 
@@ -390,9 +393,10 @@ en el nodo principal
 def guiGoBackMH():
     mainHorizontalWindow.hide()
     nodesWindow.show()
-    mainHorizontalWindow.inputTableName.setText("")
-    mainHorizontalWindow.inputTable.setPlainText("")
+    mainHorizontalWindow.inputName.setText("")
+    mainHorizontalWindow.inputAttributeName.setText("")
     mainHorizontalWindow.cbNodes.clear()
+    mainHorizontalWindow.lstInsertedNodes.clear()
 
 
 def guiAddAttributeMH():
@@ -424,8 +428,11 @@ en los nodos secundarios
 def guiGoBackH():
     horizontalWindow.hide()
     nodesWindow.show()
-    horizontalWindow.inputTable.setPlainText("")
+    
+    horizontalWindow.inputName.setText("")
+    horizontalWindow.inputAttributeName.setText("")
     horizontalWindow.cbNodes.clear()
+    horizontalWindow.lstInsertedNodes.clear()
 
 
 def guiAddAttributeH():
@@ -506,8 +513,9 @@ def guiGoBackMB():
     mainBothWindow.hide()
     nodesWindow.show()
     mainBothWindow.cbNodes.clear()
-    mainBothWindow.inputTable.setPlainText("")
-    mainBothWindow.inputTableName.setText("")
+    mainBothWindow.lstInsertedNodes.clear()
+    mainBothWindow.inputName.setText("")
+    mainBothWindow.inputAttributeName.setText("")
 
 
 def guiBothWindow():
@@ -517,24 +525,18 @@ def guiBothWindow():
     for node in range(nodesWindow.lstInsertedNodes.count()):
         nodes.append(nodesWindow.lstInsertedNodes.item(node).text()) #se añaden los nodos existentes al combobox    
 
-    global tableName
-    tableName = mainBothWindow.inputTableName.text()
-    attributes = mainBothWindow.inputTable.toPlainText()
-    mainBothWindow.inputTable.setPlainText("")
-    mainBothWindow.inputTableName.setText("")
-    attributesList = attributes.split(",\n") #se recogen los atributos introducidos
-    
-    
-    for attribute in attributesList:
-        if "primary key" in attribute.lower():
-            global primaryKey
-            primaryKey = attribute #se guarda la llave primaria
+    tableName = mainBothWindow.inputName.text()
 
-    query = """
-    CREATE TABLE {} (
-        {}
-    );
-    """.format(tableName, attributes) #se crea la query para crear la tabla
+    table = "CREATE TABLE {}(\n".format(tableName)
+
+    for i in attributesList:
+        if i["primaryKey"]:
+            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+        else:
+            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+
+    table += ");"
+
     mainNode["name"] = mainBothWindow.cbNodes.currentText() #se guarda el nombre del nodo principal
 
     for node in nodeList: #se guardan los datos del nodo principal
@@ -550,17 +552,33 @@ def guiBothWindow():
             bothWindow.cbNodes.addItem(node)
     
     bothWindow.show()
-    generateMBTable(query, primaryKey, tableName)
-
-
-def generateMBTable(query,primaryKey, tableName):
     doConnection(query, mainNode)
+    mainBothWindow.inputName.setText("")
+    mainBothWindow.inputAttributeName.setText("")
+    mainBothWindow.lstInsertedNodes.clear()
+    attributesList = []
 
-    bothWindow.inputTable.setPlainText("""
-    CREATE TABLE {} (
-        {},
-    );
-    """.format(tableName, primaryKey)) #se autocompleta el nombre de la tabla y los atributos para el siguiente nodo
+
+def guiAddAttributeMB():
+    attributeName = mainBothWindow.inputAttributeName.text()
+    attributeType = mainBothWindow.cbAttributesType.currentText()
+    primaryKey = mainBothWindow.chbPrimaryKey.isChecked()
+
+    if primaryKey:
+        mainBothWindow.lstInsertedNodes.addItem("{} {} (pk)".format(attributeName, attributeType))
+    else:
+        mainBothWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
+
+    mainBothWindow.inputAttributeName.setText("")
+    mainBothWindow.chbPrimaryKey.setChecked(False)
+
+    attribute = {
+        "attributeName": attributeName,
+        "attributeType": attributeType,
+        "primaryKey": primaryKey
+    }
+
+    attributesList.append(attribute)
 
 
 def guiSelectNodeB():
@@ -574,12 +592,26 @@ def guiGoBackB():
 
     bothWindow.cbNodes.clear()
     bothWindow.lstNodes.clear()
-    bothWindow.inputTable.setPlainText("")
+    bothWindow.lstAttributes.clear()
+    bothWindow.inputName.setText("")
+    bothWindow.inputAttributeName.setText("")
 
 
 def guiGenerateBothSegmentation():
 
-    table = bothWindow.inputTable.toPlainText()
+    tableName = bothWindow.inputName.text()
+
+    table = "CREATE TABLE {} (\n".format(tableName)
+
+    for i in attributesList:
+        if i["primaryKey"]:
+            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+        else:
+            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+
+    table += ");"
+
+
     nodes = []
     for node in range(bothWindow.lstNodes.count()): #se recorre la ventana con los nodos
         readedNode = bothWindow.lstNodes.item(node).text()
@@ -593,7 +625,6 @@ def guiGenerateBothSegmentation():
         "user": "",
         "password": ""
     }
-    
 
     for n in nodes:
         for i in nodeList: #se obtienen los datos del nodo
@@ -618,16 +649,31 @@ def guiGenerateBothSegmentation():
         """.format(mainNode["name"], mainNode["host"], mainNode["database"], 
         mainNode["port"], mainNode["name"], mainNode["user"], mainNode["password"])
         doConnection(query,node) #se crea la query para los data wrappers y el user mapping
-    
-    bothWindow.inputTable.setPlainText(""" 
-    CREATE TABLE {} (
-        {},
-    );
-    """.format(tableName, primaryKey)) #se crea la tabla con los atributos
+
     bothWindow.lstNodes.clear()
+    nodeList = []
     
         
-   
+def guiAddAttributeB():
+    attributeName = bothWindow.inputAttributeName.text()
+    attributeType = bothWindow.cbAttributesType.currentText()
+    primaryKey = bothWindow.chbPrimaryKey.isChecked()
+
+    if primaryKey:
+        bothWindow.lstAttributes.addItem("{} {} (pk)".format(attributeName, attributeType))
+    else:
+        bothWindow.lstAttributes.addItem("{} {}".format(attributeName, attributeType))
+
+    bothWindow.inputAttributeName.setText("")
+    bothWindow.chbPrimaryKey.setChecked(False)
+
+    attribute = {
+        "attributeName": attributeName,
+        "attributeType": attributeType,
+        "primaryKey": primaryKey
+    }
+
+    attributesList.append(attribute)
 
 
 
@@ -652,11 +698,13 @@ deleteWindow.btnDelete.clicked.connect(guiDeleteNode)
 deleteWindow.btnGoBack.clicked.connect(guiGoBackD)
 mainBothWindow.btnGoBack.clicked.connect(guiGoBackMB)
 mainBothWindow.btnCreate.clicked.connect(guiBothWindow)
+mainBothWindow.btnAddAttribute.clicked.connect(guiAddAttributeMB)
 bothWindow.btnAddNode.clicked.connect(guiSelectNodeB)
 bothWindow.btnGoBack.clicked.connect(guiGoBackB)
 bothWindow.btnCreate.clicked.connect(guiGenerateBothSegmentation)
+bothWindow.btnAddAttribute.clicked.connect(guiAddAttributeB)
 
 
 # Ejecutable
-mainHorizontalWindow.show()
+mainBothWindow.show()
 app.exec()
