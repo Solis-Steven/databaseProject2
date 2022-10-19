@@ -331,7 +331,12 @@ def guiHorizontalWindow():
     
     horizontalWindow.show()
     doConnection(query, mainNode)
-    attributesList = []
+
+    horizontalWindow.inputName.setText(tableName)
+
+    for i in range(mainHorizontalWindow.lstInsertedNodes.count()):
+        attribute = mainHorizontalWindow.lstInsertedNodes.item(i).text()
+        horizontalWindow.cbAttributes.addItem(attribute)
 
 
 """
@@ -445,6 +450,7 @@ def guiGoBackH():
     horizontalWindow.inputAttributeName.setText("")
     horizontalWindow.cbNodes.clear()
     horizontalWindow.lstInsertedNodes.clear()
+    horizontalWindow.cbAttributes.clear()
 
 
 def guiAddAttributeH():
@@ -469,6 +475,9 @@ def guiAddAttributeH():
     attributesList.append(attribute)
     
 
+def guiAddAttributeH2():
+    attribute = horizontalWindow.cbAttributes.currentText()
+    horizontalWindow.lstInsertedNodes.addItem(attribute)
 
 def guiDeleteNodeWindow():
     nodesWindow.hide()
@@ -713,6 +722,7 @@ mainHorizontalWindow.btnAddAttribute.clicked.connect(guiAddAttributeMH)
 horizontalWindow.btnCreate.clicked.connect(guiHorizontalWindow2)
 horizontalWindow.btnGoBack.clicked.connect(guiGoBackH)
 horizontalWindow.btnAddAttribute.clicked.connect(guiAddAttributeH)
+horizontalWindow.btnAddAttribute_2.clicked.connect(guiAddAttributeH2)
 deleteWindow.btnDelete.clicked.connect(guiDeleteNode)
 deleteWindow.btnGoBack.clicked.connect(guiGoBackD)
 mainBothWindow.btnGoBack.clicked.connect(guiGoBackMB)
