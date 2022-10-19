@@ -331,7 +331,7 @@ def guiHorizontalWindow():
     
     horizontalWindow.show()
     doConnection(query, mainNode)
-
+    attributesList = []
     horizontalWindow.inputName.setText(tableName)
 
     for i in range(mainHorizontalWindow.lstInsertedNodes.count()):
@@ -578,6 +578,13 @@ def guiBothWindow():
     
     bothWindow.show()
     doConnection(table, mainNode)
+
+    bothWindow.inputName.setText(tableName)
+
+    for i in range(mainBothWindow.lstInsertedNodes.count()):
+        attribute = mainBothWindow.lstInsertedNodes.item(i).text()
+        bothWindow.cbAttributes.addItem(attribute)
+
     mainBothWindow.inputName.setText("")
     mainBothWindow.inputAttributeName.setText("")
     mainBothWindow.lstInsertedNodes.clear()
@@ -703,7 +710,9 @@ def guiAddAttributeB():
 
     attributesList.append(attribute)
 
-
+def guiAddAttributeB2():
+    attribute = bothWindow.cbAttributes.currentText()
+    bothWindow.lstAttributes.addItem(attribute)
 
 # Eventos que se activan cuando se presiona un boton
 nodesWindow.btnInsert.clicked.connect(guiAddNode)
@@ -732,6 +741,7 @@ bothWindow.btnAddNode.clicked.connect(guiSelectNodeB)
 bothWindow.btnGoBack.clicked.connect(guiGoBackB)
 bothWindow.btnCreate.clicked.connect(guiGenerateBothSegmentation)
 bothWindow.btnAddAttribute.clicked.connect(guiAddAttributeB)
+bothWindow.btnAddAttribute_2.clicked.connect(guiAddAttributeB2)
 
 
 # Ejecutable

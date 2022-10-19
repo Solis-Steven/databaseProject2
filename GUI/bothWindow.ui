@@ -52,7 +52,7 @@ color: black;</string>
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>130</y>
+      <y>260</y>
       <width>81</width>
       <height>41</height>
      </rect>
@@ -90,7 +90,7 @@ color: rgb(255, 255, 255);
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>140</y>
+      <y>270</y>
       <width>171</width>
       <height>22</height>
      </rect>
@@ -123,10 +123,10 @@ color: rgb(255, 255, 255);
    <widget class="QListWidget" name="lstNodes">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>170</y>
-      <width>251</width>
-      <height>301</height>
+      <x>480</x>
+      <y>310</y>
+      <width>281</width>
+      <height>151</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -366,6 +366,57 @@ color: black;</string>
     </property>
     <property name="text">
      <string>Type:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbAttributes">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>140</y>
+      <width>181</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 12pt &quot;Arial&quot;;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnAddAttribute_2">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>220</y>
+      <width>291</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 10px;
+font: 12pt &quot;Arial&quot;;
+background-color: rgb(16, 16, 16);
+color: rgb(255, 255, 255);
+
+</string>
+    </property>
+    <property name="text">
+     <string>ADD ATTRIBUTE</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblNodes_2">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>130</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 16pt &quot;Arial&quot;;
+color: black;</string>
+    </property>
+    <property name="text">
+     <string>Attributes:</string>
     </property>
    </widget>
   </widget>
