@@ -370,15 +370,17 @@ def guiHorizontalWindow2():
 
     table = "CREATE TABLE {} (\n".format(tableName)
 
-    for i in range(nodesWindow.lstInsertedNodes.count()):
-        i = i.split()
-        if i.len() == 3:
-            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
+    for i in range(horizontalWindow.lstInsertedNodes.count()):
+        i = horizontalWindow.lstInsertedNodes.item(i).text().split()
+        if len(i) == 3:
+            table += ("{} {} PRIMARY KEY,\n".format(i[0].lower(), i[1]))
         else:
-            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+            table += ("{} {},\n".format(i[0].lower(), i[1]))
 
     table = table[:len(table)-2]
     table += "\n);"
+
+    print (table)
 
     doConnection(table, node) #se crea la conexion con los datos del nodo
     horizontalWindow.inputAttributeName.setText("")
@@ -460,12 +462,12 @@ def guiAddAttributeH():
     horizontalWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
 
     horizontalWindow.inputAttributeName.setText("")
-    horizontalWindow.chbPrimaryKey.setChecked(False)
+
 
     attribute = {
         "attributeName": attributeName,
         "attributeType": attributeType,
-        "primaryKey": primaryKey
+        "primaryKey": False
     }
 
     attributesList.append(attribute)
