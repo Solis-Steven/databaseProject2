@@ -588,6 +588,7 @@ def guiBothWindow():
     mainBothWindow.inputName.setText("")
     mainBothWindow.inputAttributeName.setText("")
     mainBothWindow.lstInsertedNodes.clear()
+    mainBothWindow.cbNodes.clear()
     attributesList = []
 
 
@@ -685,6 +686,7 @@ def guiGenerateBothSegmentation():
         doConnection(query,node) #se crea la query para los data wrappers y el user mapping
 
     bothWindow.lstNodes.clear()
+    bothWindow.lstAttributes.clear()
     nodeList = []
     attributesList = []
     
