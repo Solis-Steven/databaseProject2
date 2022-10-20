@@ -634,8 +634,12 @@ def guiGenerateBothSegmentation():
 
     table = "CREATE TABLE {} (\n".format(tableName)
     global attributesList
-    for i in attributesList:
-        table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+    for i in range(bothWindow.lstAttributes.count()):
+        i = bothWindow.lstAttributes.item(i).text().split()
+        if len(i) == 3:
+            table += ("{} {} PRIMARY KEY,\n".format(i[0].lower(), i[1]))
+        else:
+            table += ("{} {},\n".format(i[0].lower(), i[1]))
 
     table = table[:len(table)-2]
     table += "\n);"
@@ -689,20 +693,16 @@ def guiGenerateBothSegmentation():
 def guiAddAttributeB():
     attributeName = bothWindow.inputAttributeName.text()
     attributeType = bothWindow.cbAttributesType.currentText()
-    primaryKey = bothWindow.chbPrimaryKey.isChecked()
+    
 
-    if primaryKey:
-        bothWindow.lstAttributes.addItem("{} {} (pk)".format(attributeName, attributeType))
-    else:
-        bothWindow.lstAttributes.addItem("{} {}".format(attributeName, attributeType))
+    bothWindow.lstAttributes.addItem("{} {}".format(attributeName, attributeType))
 
     bothWindow.inputAttributeName.setText("")
-    bothWindow.chbPrimaryKey.setChecked(False)
 
     attribute = {
         "attributeName": attributeName,
         "attributeType": attributeType,
-        "primaryKey": primaryKey
+        "primaryKey": False
     }
 
     attributesList.append(attribute)
