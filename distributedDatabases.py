@@ -370,9 +370,9 @@ def guiHorizontalWindow2():
 
     table = "CREATE TABLE {} (\n".format(tableName)
 
-    global attributesList
-    for i in attributesList:
-        if i["primaryKey"]:
+    for i in range(nodesWindow.lstInsertedNodes.count()):
+        i = i.split()
+        if i.len() == 3:
             table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
         else:
             table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
