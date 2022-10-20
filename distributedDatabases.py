@@ -456,12 +456,8 @@ def guiGoBackH():
 def guiAddAttributeH():
     attributeName = horizontalWindow.inputAttributeName.text()
     attributeType = horizontalWindow.cbAttributesType.currentText()
-    primaryKey = horizontalWindow.chbPrimaryKey.isChecked()
 
-    if primaryKey:
-        horizontalWindow.lstInsertedNodes.addItem("{} {} (pk)".format(attributeName, attributeType))
-    else:
-        horizontalWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
+    horizontalWindow.lstInsertedNodes.addItem("{} {}".format(attributeName, attributeType))
 
     horizontalWindow.inputAttributeName.setText("")
     horizontalWindow.chbPrimaryKey.setChecked(False)
@@ -637,10 +633,7 @@ def guiGenerateBothSegmentation():
     table = "CREATE TABLE {} (\n".format(tableName)
     global attributesList
     for i in attributesList:
-        if i["primaryKey"]:
-            table += ("{} {} PRIMARY KEY,\n".format(i["attributeName"].lower(), i["attributeType"]))
-        else:
-            table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
+        table += ("{} {},\n".format(i["attributeName"].lower(), i["attributeType"]))
 
     table = table[:len(table)-2]
     table += "\n);"
