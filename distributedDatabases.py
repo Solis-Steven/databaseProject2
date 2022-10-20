@@ -417,7 +417,11 @@ def guiGoBackMH():
     mainHorizontalWindow.cbNodes.clear()
     mainHorizontalWindow.lstInsertedNodes.clear()
 
-
+"""
+Esta funcion se encarga de añadir el atributo con sus 
+respectivos formatos al texto para que el usuario lo pueda
+visualizar
+"""
 def guiAddAttributeMH():
     attributeName = mainHorizontalWindow.inputAttributeName.text()
     attributeType = mainHorizontalWindow.cbAttributesType.currentText()
@@ -454,7 +458,11 @@ def guiGoBackH():
     horizontalWindow.lstInsertedNodes.clear()
     horizontalWindow.cbAttributes.clear()
 
-
+"""
+Esta funcion se encarga de añadir el atributo con sus 
+respectivos formatos al texto para que el usuario lo pueda
+visualizar
+"""
 def guiAddAttributeH():
     attributeName = horizontalWindow.inputAttributeName.text()
     attributeType = horizontalWindow.cbAttributesType.currentText()
@@ -472,11 +480,19 @@ def guiAddAttributeH():
 
     attributesList.append(attribute)
     
-
+"""
+Esta funcion se encarga de añadir el atributo con sus 
+respectivos formatos al texto para que el usuario lo pueda
+visualizar
+"""
 def guiAddAttributeH2():
     attribute = horizontalWindow.cbAttributes.currentText()
     horizontalWindow.lstInsertedNodes.addItem(attribute)
 
+"""
+Esta funcion se encarga de eliminar la ventana
+de nodos con todos los respectivos nodos
+"""
 def guiDeleteNodeWindow():
     nodesWindow.hide()
 
@@ -489,7 +505,10 @@ def guiDeleteNodeWindow():
 
     deleteWindow.show()
 
-
+"""
+Esta funcion se encarga de eliminar la lod nodos
+si se verifica que tienen el mismo combre
+"""
 def guiDeleteNode():
     currentNode = deleteWindow.cbNodes.currentText()
     
@@ -502,7 +521,11 @@ def guiDeleteNode():
     for node in nodeList:
         deleteWindow.cbNodes.addItem(node["name"])
 
-    
+"""
+Esta funcion se encarga de darle funcion al boton de volver atras
+"go back" en la interfaz grafica en la parte de creacion de tabla
+en los nodos secundarios
+"""    
 def guiGoBackD():
     deleteWindow.hide()
 
@@ -527,7 +550,11 @@ def guiMainBothWindow():
 
     mainBothWindow.show()
 
-
+"""
+Esta funcion se encarga de darle funcion al boton de volver atras
+"go back" en la interfaz grafica en la parte de creacion de tabla
+en los nodos secundarios
+"""
 def guiGoBackMB():
     mainBothWindow.hide()
     nodesWindow.show()
@@ -536,7 +563,9 @@ def guiGoBackMB():
     mainBothWindow.inputName.setText("")
     mainBothWindow.inputAttributeName.setText("")
 
-
+"""
+Esta funcion se encarga de realizar la segmentacion mixta en la creacion de las tablas
+"""
 def guiBothWindow():
     mainBothWindow.hide()
 
@@ -589,7 +618,10 @@ def guiBothWindow():
     mainBothWindow.cbNodes.clear()
     attributesList = []
 
-
+"""
+Esta funcion agrega nuevos atributos a la distribucion
+micta si asi lo desea el  usuario
+"""
 def guiAddAttributeMB():
     attributeName = mainBothWindow.inputAttributeName.text()
     attributeType = mainBothWindow.cbAttributesType.currentText()
@@ -611,12 +643,15 @@ def guiAddAttributeMB():
 
     attributesList.append(attribute)
 
-
+# Esta funcion tomas los nodos del cb y los pone en el texto
 def guiSelectNodeB():
     node = bothWindow.cbNodes.currentText()
     bothWindow.lstNodes.addItem(node)
 
-
+"""
+Esta funcion se encarga de darle funcionamiento
+al boton de devolverse atras y limpia los valores
+"""
 def guiGoBackB():
     bothWindow.hide()
     nodesWindow.show()
@@ -627,10 +662,14 @@ def guiGoBackB():
     bothWindow.inputName.setText("")
     bothWindow.inputAttributeName.setText("")
 
-
+""" 
+Esta funcion se encarga de la parte de la generacion
+de la segmentacion mixta en la cual se generan las tablas
+en la lista de nodos que el usuario desea
+"""
 def guiGenerateBothSegmentation():
 
-    tableName = bothWindow.inputName.text()
+    tableName = bothWindow.inputName.text() 
 
     table = "CREATE TABLE {} (\n".format(tableName)
     global attributesList
@@ -660,6 +699,7 @@ def guiGenerateBothSegmentation():
     }
 
     for n in nodes:
+        global nodeList
         for i in nodeList: #se obtienen los datos del nodo
             if i["name"] == n:
                 node["name"] = i["name"]
@@ -689,7 +729,10 @@ def guiGenerateBothSegmentation():
     nodeList = []
     attributesList = []
     
-        
+"""one 
+Esta funcion agrega nuevos atributos a la distribucion
+horizonatal si asi lo desea el  usuario
+"en """
 def guiAddAttributeB():
     attributeName = bothWindow.inputAttributeName.text()
     attributeType = bothWindow.cbAttributesType.currentText()
@@ -707,6 +750,11 @@ def guiAddAttributeB():
 
     attributesList.append(attribute)
 
+"""
+Esta funcion lista los atributos que ya existan
+y que el usuario selecciona para la tabla que
+es distribuida
+"""""""""""""""
 def guiAddAttributeB2():
     attribute = bothWindow.cbAttributes.currentText()
     bothWindow.lstAttributes.addItem(attribute)
