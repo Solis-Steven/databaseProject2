@@ -369,22 +369,6 @@ color: rgb(255, 255, 255);
      <string>ADD ATTRIBUTE</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chbPrimaryKey">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>240</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 16pt &quot;Arial&quot;;</string>
-    </property>
-    <property name="text">
-     <string>PRIMARY KEY</string>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources/>

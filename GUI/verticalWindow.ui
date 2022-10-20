@@ -68,9 +68,9 @@ color: black;</string>
    <widget class="QPushButton" name="btnGenerate">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>480</y>
-      <width>461</width>
+      <width>341</width>
       <height>31</height>
      </rect>
     </property>

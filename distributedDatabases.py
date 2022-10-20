@@ -381,8 +381,8 @@ def guiHorizontalWindow2():
     table += "\n);"
 
     doConnection(table, node) #se crea la conexion con los datos del nodo
-    horizontalWindow.inputName.setText("")
     horizontalWindow.inputAttributeName.setText("")
+    horizontalWindow.lstInsertedNodes.clear()
 
     randomID = str(random.randint(500, 50000))
     query = """
