@@ -81,6 +81,7 @@ def guiAddNode():
     }
 
     nodeList.append(node)
+
 """
 Esta funcion establece a coneccion con el servidor
 localizado en la base de datos con los datos brindados
@@ -379,8 +380,6 @@ def guiHorizontalWindow2():
 
     table = table[:len(table)-2]
     table += "\n);"
-
-    print (table)
 
     doConnection(table, node) #se crea la conexion con los datos del nodo
     horizontalWindow.inputAttributeName.setText("")
@@ -696,10 +695,11 @@ def guiGenerateBothSegmentation():
         "database": "",
         "user": "",
         "password": ""
-    }
+    }   
+
+    global nodeList
 
     for n in nodes:
-        global nodeList
         for i in nodeList: #se obtienen los datos del nodo
             if i["name"] == n:
                 node["name"] = i["name"]
@@ -726,7 +726,6 @@ def guiGenerateBothSegmentation():
 
     bothWindow.lstNodes.clear()
     bothWindow.lstAttributes.clear()
-    nodeList = []
     attributesList = []
     
 """one 
